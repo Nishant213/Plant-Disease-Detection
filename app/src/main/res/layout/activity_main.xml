@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:background="@color/yellow"
+    >
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:text="Haloe?"
+    android:textAlignment="center"
+    android:paddingTop="30dp"
+    android:textSize="60dp"
+    android:textStyle="bold"
+    android:textColor="@color/green"
+    />
+    <ImageView
+        android:layout_height="500dp"
+        android:layout_width="match_parent"
+         android:id="@+id/image_view"
+        android:src="@drawable/aloe"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_marginTop="18dp"
+        android:text="choose image"
+        android:id="@+id/choose_image_btn"
+        android:textColor="@color/brown"
+        android:backgroundTint="@color/green"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        />
+
+</LinearLayout>
