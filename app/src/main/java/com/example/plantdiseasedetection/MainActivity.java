@@ -1,0 +1,113 @@
+package com.example.plantdiseasedetection;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.pytorch.Module;
+
+public class MainActivity extends AppCompatActivity {
+
+    ImageView mImageView;
+    Button mChooseBtn,snap;
+    Bitmap picture = null;
+    Classifier classifier;
+    TextView result;
+
+    private final int IMAGE_PICK_CODE=1000;
+    private final int PERMISSION_CODE=1001;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        classifier = new Classifier(Utils.assetFilePath(this,"model.pt"));
+        mImageView = findViewById(R.id.image_view);
+        result = findViewById(R.id.resulttv);
+        mChooseBtn = findViewById(R.id.choose_image_btn);
+        snap=findViewById(R.id.btn_snap);
+        snap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent,1888);
+            }
+        });
+        mChooseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
+                        requestPermissions(permissions, PERMISSION_CODE);
+                    } else {
+                        pickImageFromGallery();
+                    }
+                } else {
+
+                }
+            }
+
+
+        });
+
+    }
+    private void pickImageFromGallery(){
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, IMAGE_PICK_CODE);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK && requestCode==IMAGE_PICK_CODE){
+            mImageView.setImageURI(data.getData());
+
+//            System.out.println("DONEEEEEEEEEE");
+//            result.setText("Loading.......");
+//            System.out.println("LOADING ############################");
+//            String pred = classifier.predict();
+//            System.out.println("PRED ############################");
+//            Toast.makeText(this,"Prediction done",Toast.LENGTH_LONG).show();
+//            result.setText(pred);
+        }
+        else if(requestCode == 1888) {
+            picture = (Bitmap) data.getExtras().get("data");
+            mImageView.setImageBitmap(picture);
+
+            String pred = classifier.predict(picture);
+            Toast.makeText(this,"Prediction done",Toast.LENGTH_LONG).show();
+            result.setText(pred);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case PERMISSION_CODE:{
+                if(grantResults.length>0&& grantResults[0]== PackageManager.PERMISSION_GRANTED)
+                    pickImageFromGallery();
+                else{
+                    Toast.makeText(this,"Permission denied",Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+}
