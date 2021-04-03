@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import org.pytorch.Module;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     ImageView mImageView;
@@ -77,14 +79,15 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK && requestCode==IMAGE_PICK_CODE){
             mImageView.setImageURI(data.getData());
-
-//            System.out.println("DONEEEEEEEEEE");
-//            result.setText("Loading.......");
-//            System.out.println("LOADING ############################");
-//            String pred = classifier.predict();
-//            System.out.println("PRED ############################");
-//            Toast.makeText(this,"Prediction done",Toast.LENGTH_LONG).show();
-//            result.setText(pred);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String pred = classifier.predict(bitmap);
+            Toast.makeText(this,"Prediction done",Toast.LENGTH_LONG).show();
+            result.setText(pred);
         }
         else if(requestCode == 1888) {
             picture = (Bitmap) data.getExtras().get("data");
