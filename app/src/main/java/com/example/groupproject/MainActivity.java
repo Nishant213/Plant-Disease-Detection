@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,7 +19,7 @@ import android.widget.Toast;
  public class MainActivity extends AppCompatActivity {
 
     ImageView mImageView;
-    Button mChooseBtn;
+    Button mChooseBtn,snap;
 
     private static final int IMAGE_PICK_CODE=1000;
      private static final int PERMISSION_CODE=1001;
@@ -28,7 +30,14 @@ import android.widget.Toast;
 
         mImageView = findViewById(R.id.image_view);
         mChooseBtn = findViewById(R.id.choose_image_btn);
-
+snap=findViewById(R.id.btn_snap);
+snap.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+Intent cameraIntent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+startActivityForResult(cameraIntent,1888);
+    }
+});
         mChooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,6 +69,11 @@ import android.widget.Toast;
          super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK && requestCode==IMAGE_PICK_CODE){
             mImageView.setImageURI(data.getData());
+        }
+        else if(requestCode == 1888) {
+                 Bitmap picture = (Bitmap) data.getExtras().get("data");
+            mImageView.setImageBitmap(picture);
+
         }
 
     }
